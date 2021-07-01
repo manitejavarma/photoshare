@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
 
-function App() {
+/**
+ * Component to handle file upload. Works for image
+ * uploads, but can be edited to work for any file.
+ */
+function FileUpload() {
+  // State to store uploaded file
+  const [file, setFile] = React.useState("");
+
+  // Handles file upload event and updates state
+  function handleUpload(event) {
+    setFile(event.target.files[0]);
+
+    // Add code here to upload file to server
+    // ...
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div id="upload-box">
+      <input type="file" onChange={handleUpload} />
+      <p>Filename: {file.name}</p>
+      <p>File type: {file.type}</p>
+      <p>File size: {file.size} bytes</p>
+      {file && <ImageThumb image={file} />}
     </div>
   );
 }
 
-export default App;
+/**
+ * Component to display thumbnail of image.
+ */
+const ImageThumb = ({ image }) => {
+  return <img src={URL.createObjectURL(image)} alt={image.name} />;
+};
+
+
+export default function App() {
+  return <FileUpload />;
+}
