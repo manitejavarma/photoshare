@@ -9,25 +9,63 @@ function FileUpload() {
   // State to store uploaded file
   const [file, setFile] = React.useState("");
   const [response, setResponse] = React.useState(null)
+  
+  
+  // a test method to get all images on click of a button
+  const hitBackend = () => {
+	  axios.get('/getImages').then((response) => {
+			//setResponse(response.data)
+			console.log(response.data)
+			//let jsonReponse = JSON.parse(response.data)
+			let jsonReponse = response.data
+			console.log("JSON" , jsonReponse)
+			for (let i = 1; i < jsonReponse.length; i++) {
+			  console.log(jsonReponse[i].fileName);
+			}
+			const imgFile = new Blob([jsonReponse[1].data]);
+			const imgUrl = URL.createObjectURL(imgFile);
+			setResponse(jsonReponse[2].data);
+		  })
+	  
+	  
+	  }
 
   // Handles file upload event and updates state
   function handleUpload(event) {
-    setFile(event.target.files[0]);
+	const fileToUpload = event.target.files[0]
+    
 
     // Add code here to upload file to server
     // ...
+	const encodeImage = (mimetype, arrayBuffer) => {
+        let u8 = new Uint8Array(arrayBuffer)
+        const b64encoded = btoa([].reduce.call(new Uint8Array(arrayBuffer),function(p,c){return p+String.fromCharCode(c)},''))
+        return "data:"+mimetype+";base64,"+b64encoded;
+    }
+
+    const uploadImage = async () => {
+      const data = new FormData();
+      data.append('file', fileToUpload);
+      data.append('filename', fileToUpload.name);
+
+      // POST request
+      const result = await axios.post('/upload', data, { 
+                                        headers: { 'Content-Type': 'multipart/form-data'}
+      });
+    }
+
+    uploadImage();
   }
-  const hitBackend = () => {axios.get('/testAPI').then((response) => {setResponse(response.data)})}
+  
 
   return (
     <div id="upload-box">
-      <button onClick={hitBackend}>Send request</button>
       <p>{typeof reponse === undefined ? 'loading' : response}</p>
+	  <button onClick={hitBackend}>Get Images</button><br/>
       <input type="file" onChange={handleUpload} />
-      <p>Filename: {file.name}</p>
-      <p>File type: {file.type}</p>
-      <p>File size: {file.size} bytes</p>
-      {file && <ImageThumb image={file} />}
+	  <br/>
+      <img src={response} />
+	  {<p> </p>}
     </div>
   );
 }

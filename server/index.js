@@ -1,14 +1,24 @@
-const express = require('express')
-const path = require('path')
+const bodyParser = require('body-parser'),
+      express = require('express'),
+      cors = require('cors'),
+      app = express();
 
-const app = express()
+// --------------------------------------------------------------------
+// APP CONFIG
+// --------------------------------------------------------------------
+app.use(cors())
+   .use(bodyParser.json())
+   .use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/testAPI', (req, res) => {
-    res.send('This is the backend')
-})
+// --------------------------------------------------------------------
+// ROUTES
+// --------------------------------------------------------------------
+const  Router = require('./routes/avatar');
 
-const PORT = process.env.PORT || 3001
+app.use("/", Router);
 
-app.listen(PORT, () => {
-    console.log('Server listening on ${PORT}')
-})
+// --------------------------------------------------------------------
+// SERVER LISTENER
+// --------------------------------------------------------------------
+
+app.listen(3001, () => console.log('Server listening on port 3001!'));
