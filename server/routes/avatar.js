@@ -21,7 +21,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
     const params = {
         Bucket: BUCKET_NAME,
-        Key: image.originalname,
+        Key: Date.now() + image.originalname,
         Body: fileContent
     };
 
@@ -35,7 +35,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     });
 });
 
-const imagesList = ["download.png", "download.jpg"];
 
 var ImageDataList=new Array;
 
@@ -43,6 +42,7 @@ var ImageDataList=new Array;
 	
 	router.get('/getImages', async (req, res) => {
 		
+		const imagesList = JSON.parse(req.query.images)
 		const AWS = require('aws-sdk');
 					// The name of the bucket that you have created
 		const BUCKET_NAME = 'photosharingcloud';
@@ -82,7 +82,8 @@ var ImageDataList=new Array;
 				
 				var image = new Object();
 				image.fileName = imagesList[index];
-				image.data = 'data:image/png;base64,' + Buffer.from(data.Body).toString('base64');
+				let fileExtension = imagesList[index].split('.').pop()
+				image.data = 'data:image/'+fileExtension +';base64,' + Buffer.from(data.Body).toString('base64');
 				
 				fetchedImagesInJSONFormat.push(image);
 			}

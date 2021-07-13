@@ -1,6 +1,8 @@
 import React from "react";
 import axios from 'axios'
 
+const {useState, useCallback} = React;
+
 /**
  * Component to handle file upload. Works for image
  * uploads, but can be edited to work for any file.
@@ -9,24 +11,27 @@ function FileUpload() {
   // State to store uploaded file
   const [file, setFile] = React.useState("");
   const [response, setResponse] = React.useState(null)
+  const [imagesData, setImagesData] = useState([]);
   
   
   // a test method to get all images on click of a button
-  const hitBackend = () => {
-	  axios.get('/getImages').then((response) => {
+  
+  const getImages = () => {
+	  const imagesList = ["download.png", "download.jpg","cat.png","timetable.PNG","course registration.png","1626142757157pei.jpg"];
+	  axios.get('/getImages',{
+		   params: {
+			images: JSON.stringify(imagesList)
+		  }
+	  }).then((response) => {
 			//setResponse(response.data)
 			console.log(response.data)
 			//let jsonReponse = JSON.parse(response.data)
 			let jsonReponse = response.data
-			console.log("JSON" , jsonReponse)
 			for (let i = 1; i < jsonReponse.length; i++) {
-			  console.log(jsonReponse[i].fileName);
+			  setImagesData(imagesData => [...imagesData, jsonReponse[i].data]);
 			}
-			const imgFile = new Blob([jsonReponse[1].data]);
-			const imgUrl = URL.createObjectURL(imgFile);
-			setResponse(jsonReponse[2].data);
+			console.log(imagesData)
 		  })
-	  
 	  
 	  }
 
@@ -34,14 +39,6 @@ function FileUpload() {
   function handleUpload(event) {
 	const fileToUpload = event.target.files[0]
     
-
-    // Add code here to upload file to server
-    // ...
-	const encodeImage = (mimetype, arrayBuffer) => {
-        let u8 = new Uint8Array(arrayBuffer)
-        const b64encoded = btoa([].reduce.call(new Uint8Array(arrayBuffer),function(p,c){return p+String.fromCharCode(c)},''))
-        return "data:"+mimetype+";base64,"+b64encoded;
-    }
 
     const uploadImage = async () => {
       const data = new FormData();
@@ -61,22 +58,15 @@ function FileUpload() {
   return (
     <div id="upload-box">
       <p>{typeof reponse === undefined ? 'loading' : response}</p>
-	  <button onClick={hitBackend}>Get Images</button><br/>
+	  <button onClick={getImages}>Get Images</button><br/>
       <input type="file" onChange={handleUpload} />
 	  <br/>
-      <img src={response} />
+	  //Right now showing only one image, show all images later
+      <img src={imagesData[4]} />
 	  {<p> </p>}
     </div>
   );
 }
-
-/**
- * Component to display thumbnail of image.
- */
-const ImageThumb = ({ image }) => {
-  return <img src={URL.createObjectURL(image)} alt={image.name} />;
-};
-
 
 export default function App() {
   return <FileUpload />;
