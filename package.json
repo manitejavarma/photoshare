@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-api-gateway-client": "^0.3.7",
     "aws-sdk": "^2.943.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
