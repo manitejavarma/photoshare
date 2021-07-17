@@ -10,6 +10,7 @@
     "amazon-cognito-identity-js": "^5.0.5",
     "aws-sdk": "^2.947.0",
     "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-images-upload": "^1.2.8",
