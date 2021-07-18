@@ -3,13 +3,12 @@
     "userPool": "us-east-1_dKDCm5BIM",
     "userPoolBaseUri": "https://image-uploader-project.auth.us-east-1.amazoncognito.com",
     "clientId": "1e83leudils72hf4ef6va9cbct",
-    "callbackUri": "http://localhost:3000/landing_page",
+    "callbackUri": "http://localhost:3000/callback",
     "signoutUri": "http://localhost:3000/",
     "tokenScopes": [
         "openid",
         "email",
         "profile",
         "https://image-uploader-project.auth.us-east-1.amazoncognito.com/hello-world.all"                
-    ],
-    "apiUri": "https://image-uploader-project.auth.us-east-1.amazoncognito.com"
+    ]
 }

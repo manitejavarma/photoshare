@@ -69,13 +69,13 @@ const getCognitoSession = () => {
       console.debug('Successfully got session: ' + JSON.stringify(result))
       const session = {
         credentials: {
-          accessToken: result.accessToken.jwtToken,
           idToken: result.idToken.jwtToken,
           refreshToken: result.refreshToken.token
         },
         user: {
           userName: result.idToken.payload['cognito:username'],
-          email: result.idToken.payload.email
+          email: result.idToken.payload.email,
+          sub: result.idToken.payload.sub
         }
       }
       resolve(session)
