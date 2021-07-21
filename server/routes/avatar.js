@@ -1,3 +1,6 @@
+const { imageCreate, imagesGet } = require("./apig-service.js")
+
+
 const upload = require('./middleware'),
     express = require('express'),
     router = express.Router();
@@ -7,9 +10,9 @@ var fs = require("fs");
 
 router.post('/upload', upload.single('file'), async (req, res) => {
     const image = req.file;
+	sub = req.headers.sub
 
-
-    const fileContent = new Buffer(image.buffer, 'base64')
+    const fileContent = Buffer.from(image.buffer).toString('base64')
 
     //aws sdk starts here
 
@@ -25,12 +28,17 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         Body: fileContent
     };
 
-
     s3.putObject(params, function (err, data) {
         if (err) {
             console.log("Error: ", err);
         } else {
             console.log("Here is the data after puting in S3 bucket",data);
+			try {
+				imageCreate(sub, Date.now() + image.originalname)
+				res.status(200).json()
+			 } catch (err) {
+				res.status(500).json({ message: err })
+			 }
         }
     });
 });
@@ -42,7 +50,12 @@ var ImageDataList=new Array;
 	
 	router.get('/getImages', async (req, res) => {
 		
-		const imagesList = JSON.parse(req.query.images)
+		const sub = req.query.sub
+		const imagesList = await (async (s) => {
+			const images = await imagesGet(sub)
+			console.log(images)
+			return images
+		})()
 		const AWS = require('aws-sdk');
 					// The name of the bucket that you have created
 		const BUCKET_NAME = 'photosharingcloud';
@@ -97,47 +110,7 @@ var ImageDataList=new Array;
 			console.log(err);
 			return err;
 		});
-		
-		
-		
-		
-		/* //aws sdk starts here
-		
-		const AWS = require('aws-sdk');
-					// The name of the bucket that you have created
-		const BUCKET_NAME = 'photosharingcloud';
-		const s3 = new AWS.S3();
-		
-		const getImages = (value, index, array) => {
-			
-
-			console.log("In Get Images function")
-			var getParams = {
-				Bucket: BUCKET_NAME, // your bucket name,
-				Key: value // path to the object you're looking for
-			}
-
-			s3.getObject(getParams, function (err, data) {
-				// Handle any error and exit
-				if (err){		
-					console.log(err);
-					return err;
-				}
-				console.log(data.Body);
-				ImageDataList.push(data.Body)
-				// No error happened
-				// Convert Body from a Buffer to a String
-				
-				//let objectData = Buffer.from(data.Body).toString('utf-8'); // Use the encoding necessary
-				//res.send(objectData);
-			});
-			console.log(ImageDataList.length)
-		}
-		
-		imagesList.forEach(getImages);
-		res.writeHead(200, {'Content-Type': 'image/jpeg'});
-		res.write(ImageDataList[0], 'binary');
-		res.end(null, 'binary'); */
+	
 	});
 
 

@@ -1,3 +1,5 @@
+
+
 var apigClientFactory = require('aws-api-gateway-client').default;
 
 config = {invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev'}
@@ -29,8 +31,12 @@ var userCreate = async function (id) {
         "id": id,
         "images": []
     }
-    var response = await apigClient.invokeApi({}, path, 'PUT', {}, body)
-    console.log(response.data)
+    try {
+        var response = await apigClient.invokeApi({}, path, 'PUT', {}, body)
+        console.log(response.data)
+    } catch(e) {
+        console.error(e);
+    }
 };
 
 //Removes user using id.
@@ -44,12 +50,9 @@ var userRemove = async function (id) {
 };
 //Gets image using id.
 var imagesGet = async function (id) {
-    const images = await (async () => {
-        const user = await userGet(id)
-        const img = user['images']
-        console.log(img)
-        return img
-    })()
+    const data = await userGet(id)
+    const images = data['images']
+    console.log(images)
     return images
 }
 
@@ -74,7 +77,7 @@ var imageRemove = async function (id, object) {
 
     const body = {
         "index": await (async () => {
-            const user = await userGet("cc")
+            const user = await userGet(id)
             const images = user['images']
             console.log(images)
             return images.indexOf(object)
@@ -108,3 +111,4 @@ var imageRemove = async function (id, object) {
 // imageCreate("cc", "xas")
 //imageRemove("cc", "xas")
 
+module.exports = { imageCreate, imageRemove, userCreate, userGet, userRemove, usersGet, imagesGet }

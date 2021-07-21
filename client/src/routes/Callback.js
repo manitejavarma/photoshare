@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { initSessionFromCallbackURI } from '../actions/session'
+import UserService from "./services/user-service"
 
 function mapStateToProps (state) {
   return { session: state.session }
@@ -27,6 +28,7 @@ class Callback extends Component {
   render () {
     // If there's no auth code in the URL or we're now logged into, redirect to the root page
     if ((!this.props.location.hash && !this.props.location.search) || this.props.session.isLoggedIn) {
+      UserService.createUser(this.props.session.user.sub)
       return <Redirect to="/" />
     }
 
