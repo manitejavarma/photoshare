@@ -1,4 +1,4 @@
-.Main {
+/* .Main {
   font-family: sans-serif;
   text-align: center;
 }
@@ -6,10 +6,10 @@
 
 .Home-link {
   color: #61dafb;
-}
+} */
 
 /* Upload */
-.uploadPicturesWrapper div {
+/* .uploadPicturesWrapper div {
   justify-content: flex-start !important;
 }
 
@@ -30,4 +30,41 @@
 
 #confirm_button {
   display: none;
+} */
+
+body {
+  background-color: #f7ede2;
+}
+
+#big_container {
+  margin-top: 10em;
+  display: flex;
+  justify-content: center;
+}
+
+#container {
+  border-radius: 3em;
+  width: 40em;
+  height: 20em;
+  background-color: #98c1d9;
+}
+
+.header {
+  margin-top: 2em;
+  margin-left: 7.6em;
+}
+
+.not_logged_in {
+  margin-left: 8em;
+  font-size: 25px;
+}
+
+.Home-link {
+  margin-top: 3em;
+  margin: 18em;
+  text-decoration: none;
+}
+
+.Home-link:hover {
+  text-decoration: underline;
 }
