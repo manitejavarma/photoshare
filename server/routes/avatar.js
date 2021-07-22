@@ -12,8 +12,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     const image = req.file;
 	sub = req.headers.sub
 
-    const fileContent = Buffer.from(image.buffer).toString('base64')
-
+	const fileContent = new Buffer(image.buffer, 'base64')
     //aws sdk starts here
 
     const AWS = require('aws-sdk');
@@ -99,13 +98,11 @@ var ImageDataList=new Array;
 			fetchedImagesInJSONFormat.push(message);
 			for(var index in results) {
 				var data = results[index];
-				fileContentList.push(data.Body.toString());
-				
+				fileContentList.push(data.Body.toString())
 				var image = new Object();
 				image.fileName = imagesList[index];
 				let fileExtension = imagesList[index].split('.').pop()
 				image.data = 'data:image/'+fileExtension +';base64,' + Buffer.from(data.Body).toString('base64');
-				
 				fetchedImagesInJSONFormat.push(image);
 			}
 			// continue your process here

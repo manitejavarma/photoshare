@@ -78,7 +78,7 @@ class Home extends Component {
               onChangeStatus = {this.handleChangeStatus}
               onSubmit = {this.handleUpload}
               maxFiles = {1}
-              inputContent = "Upload or Drag File"
+              inputContent = "Upload or Drag. File"
               accept="image/*"
             />
             {/* <input type="file" onChange={this.handleUpload.bind(this)} /> */}
