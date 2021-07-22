@@ -21,10 +21,12 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     // The name of the bucket that you have created
     const BUCKET_NAME = 'photosharingcloud';
     const s3 = new AWS.S3();
+	
+	const currentTimeStamp = Date.now()
 
     const params = {
         Bucket: BUCKET_NAME,
-        Key: Date.now() + image.originalname,
+        Key: currentTimeStamp + image.originalname,
         Body: fileContent
     };
 
@@ -34,7 +36,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         } else {
             console.log("Here is the data after puting in S3 bucket",data);
 			try {
-				imageCreate(sub, Date.now() + image.originalname)
+				imageCreate(sub, currentTimeStamp + image.originalname)
 				res.status(200).json()
 			 } catch (err) {
 				res.status(500).json({ message: err })
@@ -67,6 +69,9 @@ var ImageDataList=new Array;
 					{ Bucket: BUCKET_NAME, Key: keyFile },
 					function (error, data) {
 						if(error) {
+							// if(error.code != "NoSuchKey"){
+								// reject(error);
+							// }
 							reject(error);
 						} else {
 							success(data);
@@ -78,9 +83,12 @@ var ImageDataList=new Array;
 		
 		var promises = [];
 		var fileContentList = new Array();
-
+		
+	
+		
 		for(i=0; i<imagesList.length;i++){
-			promises.push(getObject(imagesList[i]));
+			console.log(unescape(imagesList[i]));
+			promises.push(getObject(unescape(imagesList[i])));
 		}
 
 		Promise.all(promises)
@@ -108,7 +116,6 @@ var ImageDataList=new Array;
 		})
 		.catch(function(err) {
 			console.log(err);
-			return err;
 		});
 	
 	});
