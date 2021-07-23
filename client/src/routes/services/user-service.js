@@ -22,9 +22,11 @@ class UserService {
         data.append('filename', file.name);
         data.append('sub', sub)
         // POST request
-        await axios.post('/upload', data, { 
+        const res = await axios.post('/upload', data, { 
           headers: { 'Content-Type': 'multipart/form-data', 'sub': sub}
         });
+		
+		return res
     }
 
     deleteImage(sub, name) {

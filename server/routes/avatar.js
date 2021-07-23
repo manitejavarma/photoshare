@@ -36,8 +36,20 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             console.log("Here is the data after puting in S3 bucket",data);
 			try {
 				imageCreate(sub, currentTimeStamp + image.originalname)
-				res.status(200).json()
+				
+				var responseJSON = new Array();
+				var message = new Object();
+				message.status = "Success";
+				var imageObject = new Object();
+				imageObject.fileName = currentTimeStamp + image.originalname;
+				let fileExtension = imageObject.fileName.split('.').pop()
+				imageObject.data = 'data:image/'+fileExtension +';base64,' + Buffer.from(fileContent).toString('base64');
+				responseJSON.push(message);
+				responseJSON.push(imageObject);
+				
+				res.status(200).json(responseJSON)
 			 } catch (err) {
+				 console.log(err);
 				res.status(500).json({ message: err })
 			 }
         }

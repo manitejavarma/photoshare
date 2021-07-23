@@ -51,7 +51,11 @@ class Home extends Component {
     if(files[0].meta.status === "done") {
       UserService.uploadImage(this.props.session.user.sub, files[0].file)
       .then(result => {
-        this.getImages(this.props.session.user.sub, true)
+		this.setState(prevState => ({
+			
+		  images: [...prevState.images, result.data[1].data]
+		}))
+        //this.getImages(this.props.session.user.sub, true)
         files[0].remove()
       })
       
