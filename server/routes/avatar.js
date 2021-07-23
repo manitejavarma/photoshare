@@ -54,12 +54,11 @@ var ImageDataList=new Array;
 		const sub = req.query.sub
 		const imagesList = await (async (s) => {
 			const images = await imagesGet(sub)
-			console.log(images)
 			return images
 		})()
 		const AWS = require('aws-sdk');
 					// The name of the bucket that you have created
-		const BUCKET_NAME = 'photosharingcloud';
+		const BUCKET_NAME = 'photosharingcloud-resized';
 		const s3 = new AWS.S3();
 		
 		var getObject = function(keyFile) {
@@ -86,7 +85,6 @@ var ImageDataList=new Array;
 	
 		
 		for(i=0; i<imagesList.length;i++){
-			console.log(unescape(imagesList[i]));
 			promises.push(getObject(unescape(imagesList[i])));
 		}
 

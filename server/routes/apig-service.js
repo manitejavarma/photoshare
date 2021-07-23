@@ -50,9 +50,12 @@ var userRemove = async function (id) {
 };
 //Gets image using id.
 var imagesGet = async function (id) {
-    const data = await userGet(id)
-    const images = data['images']
-    console.log(images)
+    const images = await (async () => {
+        const user = await userGet(id)
+        const images = user['images']
+        console.log(images)
+        return images
+    })()
     return images
 }
 

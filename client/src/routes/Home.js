@@ -6,7 +6,8 @@ import UserService from "./services/user-service"
 import axios from 'axios'
 import 'react-dropzone-uploader/dist/styles.css'
 import Dropzone from 'react-dropzone-uploader'
-
+import { Alert } from 'react-bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 const mapStateToProps = state => {
   return { session: state.session }
@@ -16,54 +17,59 @@ class Home extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      file: null, 
-      images: [],
+      uploaded: false,
+      images: []
     }
     this.handleUpload = this.handleUpload.bind(this)
+    this.setUploaded = this.setUploaded.bind(this)
   }
-
+  
   componentDidMount()  {
-    if(typeof(this.props.session.user) !== 'undefined') {
+    if(this.props.session.isLoggedIn) {
       this.getImages(this.props.session.user.sub)
     }
-    console.log(this.state.images)
+  }
+
+  setUploaded = (val) => {
+    this.setState({
+      uploaded: val,
+      images: this.state.images
+    })
   }
 
   onSignOut = (e) => {
     e.preventDefault()
     cognitoUtils.signOutCognitoSession()
   }
-  
-  getUploadParams = ({ file, meta }) => {
-    return { }
-  }
 
   handleChangeStatus = ({ meta }, status) => {
-    console.log(status, meta)
+    // console.log(status)
   }
 
   // Handles file upload event and updates state
   handleUpload = (files, allFiles) => {
     if(files[0].meta.status === "done") {
-      UserService.uploadImage(this.props.session.user.sub, files[0].file);
-      this.setState({file: files[0].file, images: this.state.images})
+      UserService.uploadImage(this.props.session.user.sub, files[0].file)
+      .then(result => {
+        this.getImages(this.props.session.user.sub, true)
+        files[0].remove()
+      })
+      
     }
   }
 
-  getImages(sub) {
+  getImages(sub, upload = false) {
     axios.get('/getImages', {
       params: {
          sub: sub
       }
     }).then((response) => {
-       //setResponse(response.data)
-       console.log(response.data)
-       //let jsonReponse = JSON.parse(response.data)
        let jsonReponse = response.data
+       const img = []
        for (let i = 1; i < jsonReponse.length; i++) {
-         this.setState({file: this.state.file, images: [...this.state.images, jsonReponse[i].data]});
+         img[i] = jsonReponse[i].data
        }
-       console.log(this.state.images)
+      this.setState({uploaded: upload, images: img})
     })
   }
     
@@ -80,14 +86,13 @@ class Home extends Component {
               maxFiles = {1}
               inputContent = "Upload or Drag. File"
               accept="image/*"
-            />
-            {/* <input type="file" onChange={this.handleUpload.bind(this)} /> */}
+            /> 
 	          <br/>
+            {this.state.uploaded ? <Alert variant="success" onClose= {() => this.setUploaded(false)} dismissible>The image was uploaded successfully!</Alert>: null}
             {this.state.images.map(image =>(
                 <img src={image}/>
             ))}
 	          <p> </p>
-            <button id="confirm_button" onClick={this.confirmUpload}>Confirm upload</button>
             <a className="Home-link" href="#" onClick={this.onSignOut}>Sign out</a>
           </div>
           ) : (
