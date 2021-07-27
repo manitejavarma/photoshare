@@ -66,9 +66,27 @@ class Home extends Component {
     }
   }
 
-  setLargeImage = (e) => {
-    console.log(e.target.currentSrc)
-    this.setState({ isOpen: true, largeImageSrc: e.target.currentSrc })
+  setLargeImage = (fileName) => e => {
+    axios.get('/getImage', {
+      params: {
+        fileName: fileName
+      }
+    }).then((response) => {
+      let jsonResponse = response.data
+      const img = []
+      for (let i = 1; i < jsonResponse.length; i++) {
+        let temp_img = {
+          fileName: jsonResponse[i].fileName,
+          imageSrc: jsonResponse[i].data
+        }
+        img.push(temp_img)
+        // img[i] = jsonResponse[i].data
+      }
+      // console.log(img[0].imageSrc);
+      this.setState({ isOpen: true, largeImageSrc: img[0].imageSrc })
+      // this.setState({ uploaded: upload, images: img })
+    })
+    // this.setState({ isOpen: true, largeImageSrc: e.target.currentSrc })
   }
 
   getImages(sub, upload = false) {
@@ -77,10 +95,15 @@ class Home extends Component {
         sub: sub
       }
     }).then((response) => {
-      let jsonReponse = response.data
+      let jsonResponse = response.data
       const img = []
-      for (let i = 1; i < jsonReponse.length; i++) {
-        img[i] = jsonReponse[i].data
+      for (let i = 1; i < jsonResponse.length; i++) {
+        let temp_img = {
+          fileName: jsonResponse[i].fileName,
+          imageSrc: jsonResponse[i].data
+        }
+        img.push(temp_img)
+        // img[i] = jsonResponse[i].data
       }
       this.setState({ uploaded: upload, images: img })
     })
@@ -102,9 +125,13 @@ class Home extends Component {
             />
             <br />
             {this.state.uploaded ? <Alert variant="success" onClose={() => this.setUploaded(false)} dismissible>The image was uploaded successfully!</Alert> : null}
+
+            {/* Display all images here */}
             {this.state.images.map(image => (
-              <img src={image} onClick={this.setLargeImage} />
+              <img src={image.imageSrc} onClick={this.setLargeImage(image.fileName)} />
             ))}
+
+            {/* Open the modal to display large image */}
             {this.state.isOpen && (
               <Lightbox
                 mainSrc={this.state.largeImageSrc}
