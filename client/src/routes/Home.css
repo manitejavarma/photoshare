@@ -1,37 +1,39 @@
-/* .Main {
-  font-family: sans-serif;
-  text-align: center;
+html, body, #root {
+  height: 100%;
+  background-color: white;
 }
 
-
-.Home-link {
-  color: #61dafb;
-} */
-
-/* Upload */
-/* .uploadPicturesWrapper div {
-  justify-content: flex-start !important;
+.Home, .App {
+  background-color: white;
+  height: 100%
 }
-
-.uploadPictureContainer {
-  width: 200px !important;
-  height: auto !important;
-  margin: 2% 5% !important;
-  padding: 10px !important;
-}
-
-.uploadPictureContainer img {
-  height: 200px !important;
-}
-
 #hello_user {
+  text-align: center;
   margin: 1em;
 }
 
-#confirm_button {
-  display: none;
-} */
+#upload {
+  display: flex;
+  justify-content: center;
+}
 
+#upload-button {
+  width: 15%;
+}
+
+#image-container {
+  border: 1px solid #eceef3;
+  background-color: white;
+  margin: 20px 10%;
+}
+.custom-navbar {
+  background-color: white;
+  border-bottom: 2px solid #eceef3;
+  margin: 0px 10px 10px;
+  padding-bottom: 10px;
+  font-weight: bold;
+  font-size: 17px;
+}
 #container {
   border-radius: 3px;
   width: 40em;
@@ -85,7 +87,7 @@
 
     width: auto;
     height: auto;
-    background-color: #FAFBFC;
+    background-color: #f9f9f9;
     box-shadow: none;
 
 

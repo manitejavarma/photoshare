@@ -134,9 +134,20 @@ class Home extends Component {
             </Nav>
             </Navbar>
             <h1 id="hello_user">Hello {this.props.session.user.userName}, email: {this.props.session.user.email}</h1>
+            <div id="upload">
+              <div id="upload-button">
+                <Dropzone
+                  onChangeStatus={this.handleChangeStatus}
+                  onSubmit={this.handleUpload}
+                  maxFiles={1}
+                  inputContent="Upload or Drag Image"
+                  accept="image/*"
+                />
+              </div>
+            </div>
             <br />
+            {this.state.uploaded ? <Alert variant="success" onClose={() => this.setUploaded(false)} dismissible>The image was uploaded successfully!</Alert> : null}
             <div id="image-container">
-              <h2>Shared by others</h2>
               {/* Display all images here */}
               {this.state.images.map(image => (
                 <img src={image.imageSrc} alt={image.fileName} onClick={this.setLargeImage(image.fileName)} />
