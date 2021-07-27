@@ -141,11 +141,11 @@ class Home extends Component {
             <a className="Home-link" href="#" onClick={this.onSignOut}>Sign out</a>
           </div>
         ) : (
-          <div id="big_container">
-            <div id="container">
+          <div id="container">
+            <div id="container-information">
               <h1 class="header">Group 25</h1>
-              <p class="not_logged_in">You are not logged in!</p>
-              <a className="Home-link" href={cognitoUtils.getCognitoSignInUri()}>Sign in</a>
+              <p class="not_logged_in">Welcome to our photo sharing website!</p>
+              <a className="Home-link" href={cognitoUtils.getCognitoSignInUri()}><button id="login-btn">Enter</button></a>
             </div>
           </div>
         )}
