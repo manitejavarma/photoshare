@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
 import './Home.css'
+import { FaUserCircle } from 'react-icons/fa';
 
 const mapStateToProps = state => {
   return { session: state.session }
@@ -105,7 +106,7 @@ class Home extends Component {
               {this.state.images.map(image => (
                 <div className="image-div">
                   <img className="image" src={image.imageSrc} alt={image.user} onClick={this.setLargeImage(image.fileName)} />
-                  <div className="name"><a className="name-link" href="url">{image.user}</a></div>
+                  <div className="name"><FaUserCircle /> <a className="name-link" href="url">{image.user}</a></div>
                 </div>
               ))}
             </section>

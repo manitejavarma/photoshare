@@ -73,7 +73,7 @@ const getCognitoSession = () => {
           refreshToken: result.refreshToken.token
         },
         user: {
-          userName: result.idToken.payload['cognito:username'],
+          userName: result.idToken.payload['cognito:username'].slice(0, 6) === "google" ? result.idToken.payload.email.slice(0, -10) : result.idToken.payload['cognito:username'], 
           email: result.idToken.payload.email,
           sub: result.idToken.payload.sub
         }

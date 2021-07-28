@@ -27,7 +27,7 @@ html, body, #root {
 }
 
 section{
-  margin: 10px 10%;
+  margin: 10px 15%;
   padding: 2px;
   display: flex;
   flex-wrap: wrap;
@@ -133,6 +133,7 @@ section::after{
   position: absolute;
   bottom: 8px;
   left: 16px;
+  color: white;
 }
 
 .name-link{
@@ -143,8 +144,32 @@ section::after{
   color: white;
 }
 
+@media screen and (max-width: 992px){
+  #container {
+    border-radius: 3px;
+    width: 40em;
+    height: 15em;
+    background-color: white;
+  
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  section{
+    margin: 10px 10%;
+    padding: 2px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+}
+
 /* mobile responsive */
-@media screen and (max-width: 750px){
+@media screen and (max-width: 600px){
   #container {
     border-style: none;
 
@@ -160,4 +185,6 @@ section::after{
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
   }
+
 }
+
