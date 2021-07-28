@@ -40,12 +40,12 @@ section::after{
 }
 
 .image-div{
-  margin: 2px;
+  margin: 4px;
   position: relative;
-  background-color:#898989;
 }
 
 .image {
+  border-radius: 8px;
   height: 200px;
   object-fit: cover;
   max-width: 100%;
@@ -100,6 +100,10 @@ section::after{
   border-radius: .2em;
 }
 
+#login-btn:hover{
+  background-color: #3160A3;
+}
+
 #not_logged_in {
   font-size: 16px;
 }
@@ -111,6 +115,32 @@ section::after{
 
 .Home-link:hover {
   text-decoration: underline;
+}
+
+.name{
+  visibility: hidden;
+}
+
+.image-div:hover img{
+  filter: brightness(50%);
+}
+
+.image-div:hover .name{
+  visibility: visible;
+}
+
+.name{
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+}
+
+.name-link{
+  color: white;
+}
+
+.name-link, .name-link:hover, .name-link:visited, .name-link:active{
+  color: white;
 }
 
 /* mobile responsive */

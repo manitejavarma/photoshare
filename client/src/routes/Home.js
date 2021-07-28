@@ -105,6 +105,7 @@ class Home extends Component {
               {this.state.images.map(image => (
                 <div className="image-div">
                   <img className="image" src={image.imageSrc} alt={image.user} onClick={this.setLargeImage(image.fileName)} />
+                  <div className="name"><a className="name-link" href="url">{image.user}</a></div>
                 </div>
               ))}
             </section>
