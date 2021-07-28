@@ -54,7 +54,7 @@ class Home extends Component {
   // Handles file upload event and updates state
   handleUpload = (files, allFiles) => {
     if (files[0].meta.status === "done") {
-      UserService.uploadImage(this.props.session.user.sub, files[0].file)
+      UserService.uploadImage(this.props.session.user.sub, this.props.session.user.userName, files[0].file)
         .then(result => {
           const img = {
             fileName: result.data[1].fileName,
@@ -69,7 +69,7 @@ class Home extends Component {
         })
 
     }
-  }
+  } 
 
   setLargeImage = (fileName) => e => {
     axios.get('/getImage', {
@@ -147,12 +147,14 @@ class Home extends Component {
             </div>
             <br />
             {this.state.uploaded ? <Alert variant="success" onClose={() => this.setUploaded(false)} dismissible>The image was uploaded successfully!</Alert> : null}
-            <div id="image-container">
+            <section id="image-container">
               {/* Display all images here */}
               {this.state.images.map(image => (
-                <img src={image.imageSrc} alt={image.fileName} onClick={this.setLargeImage(image.fileName)} />
+                <div className="image-div">
+                  <img className="image" src={image.imageSrc} alt={image.fileName} onClick={this.setLargeImage(image.fileName)} />
+                </div>
               ))}
-            </div>
+            </section>
 
             {/* Open the modal to display large image */}
             {this.state.isOpen && (

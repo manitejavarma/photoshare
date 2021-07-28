@@ -1,4 +1,4 @@
-const { imageCreate, imagesGet } = require("./apig-service.js")
+const { imageCreate, imagesGet, imagesGetAll } = require("./apig-service.js")
 const imageThumbnail = require('image-thumbnail');
 
 const upload = require('./middleware'),
@@ -11,6 +11,7 @@ var fs = require("fs");
 router.post('/upload', upload.single('file'), async (req, res) => {
 	const image = req.file;
 	sub = req.headers.sub
+	user = req.headers.user
 
 	const fileContent = new Buffer(image.buffer, 'base64')
 	//aws sdk starts here
@@ -35,7 +36,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 		} else {
 			console.log("Here is the data after puting in S3 bucket", data);
 			try {
-				imageCreate(sub, currentTimeStamp + image.originalname)
+				imageCreate(user, sub, currentTimeStamp + image.originalname)
 
 				let options = { percentage: 50 }
 				const thumbnail = imageThumbnail(Buffer.from(fileContent).toString('base64'), options);
@@ -166,6 +167,77 @@ router.get('/getImage', async (req, res) => {
 			image.data = 'data:image/' + fileExtension + ';base64,' + Buffer.from(data.Body).toString('base64');
 			fetchedImagesInJSONFormat.push(image);
 
+			res.send(fetchedImagesInJSONFormat);
+		})
+		.catch(function (err) {
+			console.log(err);
+		});
+
+});
+
+router.get('/getAllImages', async (req, res) => {
+	
+	const imageList = await (async () => {
+		const images = await imagesGetAll()
+		return images
+	})()
+
+	imageList.sort(function(a, b) {
+		return a.image > b.image ? -1 : a.image < b.image ? 1 : 0
+	})
+
+	const imagesList = imageList.map(({ image }) => image)
+	const userList = imageList.map(({ user }) => user)
+	
+	
+	const AWS = require('aws-sdk');
+	// Get all thumbnails from this bucket
+	const BUCKET_NAME = 'photosharingcloud-resized';
+	const s3 = new AWS.S3();
+
+	var getObject = function (keyFile) {
+		return new Promise(function (success, reject) {
+			s3.getObject(
+				{ Bucket: BUCKET_NAME, Key: keyFile },
+				function (error, data) {
+					if (error) {
+						// if(error.code != "NoSuchKey"){
+						// reject(error);
+						// }
+						reject(error);
+					} else {
+						success(data);
+					}
+				}
+			);
+		});
+	}
+
+	var promises = [];
+	var fileContentList = new Array();
+
+
+
+	for (i = 0; i < imagesList.length; i++) {
+		promises.push(getObject(unescape(imagesList[i])));
+	}
+
+	Promise.all(promises)
+		.then(function (results) {
+			var fetchedImagesInJSONFormat = new Array();
+			var message = new Object();
+			message.status = "Success";
+			fetchedImagesInJSONFormat.push(message);
+			for (var index in results) {
+				var data = results[index];
+				fileContentList.push(data.Body.toString())
+				var image = new Object();
+				image.fileName = imagesList[index];
+				image.by = userList[index];
+				let fileExtension = imagesList[index].split('.').pop()
+				image.data = 'data:image/' + fileExtension + ';base64,' + Buffer.from(data.Body).toString('base64');
+				fetchedImagesInJSONFormat.push(image);
+			}
 			res.send(fetchedImagesInJSONFormat);
 		})
 		.catch(function (err) {

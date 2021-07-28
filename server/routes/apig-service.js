@@ -59,14 +59,29 @@ var imagesGet = async function (id) {
     return images
 }
 
+//Gets all users
+var imagesGetAll = async function () {
+    var path = '/images'
+    const response = await apigClient.invokeApi({}, path, 'GET', {}, {})
+    return response.data['Items']
+};
+
 //Adds an image to user using userid, imageid
-var imageCreate = async function (id, object) {
+var imageCreate = async function (user, id, object) {
     var path = '/users/{id}/image/{object}'
     params = {
         id: id,
         object: object
     }
     var response = await apigClient.invokeApi(params, path, 'POST', {}, {})
+    console.log(response.data)
+    console.log(user)
+    var path = '/images'
+    const body = {
+        image: object,
+        user: user
+    }
+    var response = await apigClient.invokeApi({}, path, 'PUT', {}, body)
     console.log(response.data)
 }
 
@@ -114,4 +129,4 @@ var imageRemove = async function (id, object) {
 // imageCreate("cc", "xas")
 //imageRemove("cc", "xas")
 
-module.exports = { imageCreate, imageRemove, userCreate, userGet, userRemove, usersGet, imagesGet }
+module.exports = { imageCreate, imageRemove, userCreate, userGet, userRemove, usersGet, imagesGet, imagesGetAll }

@@ -16,14 +16,14 @@ class UserService {
         return res
     }
 
-    uploadImage = async (sub, file) => {
+    uploadImage = async (sub, user, file) => {
         const data = new FormData();
         data.append('file', file);
         data.append('filename', file.name);
         data.append('sub', sub)
         // POST request
         const res = await axios.post('/upload', data, { 
-          headers: { 'Content-Type': 'multipart/form-data', 'sub': sub}
+          headers: { 'Content-Type': 'multipart/form-data', 'sub': sub, 'user': user}
         });
 		
 		return res

@@ -20,26 +20,17 @@ class Home extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      uploaded: false,
       images: [],
       isOpen: false,
       largeImageSrc: ''
     }
-    this.handleUpload = this.handleUpload.bind(this)
-    this.setUploaded = this.setUploaded.bind(this)
   }
+
 
   componentDidMount() {
     if (this.props.session.isLoggedIn) {
-      this.getImages(this.props.session.user.sub)
+      this.getAllImages()
     }
-  }
-
-  setUploaded = (val) => {
-    this.setState({
-      uploaded: val,
-      images: this.state.images
-    })
   }
 
   onSignOut = (e) => {
@@ -47,29 +38,6 @@ class Home extends Component {
     cognitoUtils.signOutCognitoSession()
   }
 
-  handleChangeStatus = ({ meta }, status) => {
-    // console.log(status)
-  }
-
-  // Handles file upload event and updates state
-  handleUpload = (files, allFiles) => {
-    if (files[0].meta.status === "done") {
-      UserService.uploadImage(this.props.session.user.sub, files[0].file)
-        .then(result => {
-          const img = {
-            fileName: result.data[1].fileName,
-            imageSrc: result.data[1].data
-          }
-
-          this.setState(prevState => ({
-            uploaded: true,
-            images: [img, ...prevState.images]
-          }))
-          files[0].remove()
-        })
-
-    }
-  }
 
   setLargeImage = (fileName) => e => {
     axios.get('/getImage', {
@@ -91,24 +59,20 @@ class Home extends Component {
       this.setState({ isOpen: true, largeImageSrc: img[0].imageSrc })
       // this.setState({ uploaded: upload, images: img })
     })
-    // this.setState({ isOpen: true, largeImageSrc: e.target.currentSrc })
   }
 
-  getImages(sub, upload = false) {
-    axios.get('/getImages', {
-      params: {
-        sub: sub
-      }
+  getAllImages() {
+    axios.get('/getAllImages', {
     }).then((response) => {
       let jsonResponse = response.data
       const img = []
       for (let i = 1; i < jsonResponse.length; i++) {
         let temp_img = {
           fileName: jsonResponse[i].fileName,
-          imageSrc: jsonResponse[i].data
+          imageSrc: jsonResponse[i].data,
+          user: jsonResponse[i].by
         }
         img.push(temp_img)
-        // img[i] = jsonResponse[i].data
       }
       this.setState({ images: img })
     })
@@ -133,15 +97,17 @@ class Home extends Component {
               <Nav.Link onClick={this.onSignOut}>Sign Out</Nav.Link>
             </Nav>
             </Navbar>
-            <h1 id="hello_user">Hello {this.props.session.user.userName}, email: {this.props.session.user.email}</h1>
             <br />
-            <div id="image-container">
-              <h2>Shared by others</h2>
+            <h3 id="shared">Shared by others</h3>
+            <br/>
+            <section id="image-container">
               {/* Display all images here */}
               {this.state.images.map(image => (
-                <img src={image.imageSrc} alt={image.fileName} onClick={this.setLargeImage(image.fileName)} />
+                <div className="image-div">
+                  <img className="image" src={image.imageSrc} alt={image.user} onClick={this.setLargeImage(image.fileName)} />
+                </div>
               ))}
-            </div>
+            </section>
 
             {/* Open the modal to display large image */}
             {this.state.isOpen && (
