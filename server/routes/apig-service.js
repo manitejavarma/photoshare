@@ -29,7 +29,8 @@ var userCreate = async function (id) {
     var path = '/users'
     body = {
         "id": id,
-        "images": []
+        "images": [],
+        "friends": []
     }
     try {
         var response = await apigClient.invokeApi({}, path, 'PUT', {}, body)
