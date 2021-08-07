@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import cognitoUtils from '../lib/cognitoUtils'
+import UserService from "./services/user-service"
 import axios from 'axios'
 import 'react-dropzone-uploader/dist/styles.css'
-import { Navbar, Nav } from 'react-bootstrap'
+import Dropzone from 'react-dropzone-uploader'
+import { Alert, Navbar, Container, Nav } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Lightbox from "react-image-lightbox"
@@ -62,9 +64,6 @@ class Home extends Component {
 
   getAllImages() {
     axios.get('/getAllImages', {
-      params: {
-        token: this.props.session.credentials.idToken
-      }
     }).then((response) => {
       let jsonResponse = response.data
       const img = []

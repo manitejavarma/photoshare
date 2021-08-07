@@ -12,7 +12,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 	const image = req.file;
 	sub = req.headers.sub
 	user = req.headers.user
-	identificationToken = req.headers.token
 
 	const fileContent = new Buffer(image.buffer, 'base64')
 	//aws sdk starts here
@@ -35,9 +34,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 		if (err) {
 			console.log("Error: ", err);
 		} else {
-			// console.log("Here is the data after puting in S3 bucket", data);
+			console.log("Here is the data after puting in S3 bucket", data);
 			try {
-				imageCreate(user, sub, currentTimeStamp + image.originalname, identificationToken)
+				imageCreate(user, sub, currentTimeStamp + image.originalname)
 
 				let options = { percentage: 50 }
 				const thumbnail = imageThumbnail(Buffer.from(fileContent).toString('base64'), options);
@@ -71,9 +70,8 @@ var ImageDataList = new Array;
 router.get('/getImages', async (req, res) => {
 
 	const sub = req.query.sub
-	const identificationToken = req.query.token
 	const imagesList = await (async (s) => {
-		const images = await imagesGet(sub, identificationToken)
+		const images = await imagesGet(sub)
 		return images
 	})()
 	const AWS = require('aws-sdk');
@@ -132,7 +130,7 @@ router.get('/getImages', async (req, res) => {
 });
 
 
-//Just get one Image!
+//Just, get one damn Image!
 router.get('/getImage', async (req, res) => {
 
 	const fileName = req.query.fileName
@@ -178,10 +176,9 @@ router.get('/getImage', async (req, res) => {
 });
 
 router.get('/getAllImages', async (req, res) => {
-
-	const identificationToken = req.query.token
+	
 	const imageList = await (async () => {
-		const images = await imagesGetAll(identificationToken)
+		const images = await imagesGetAll()
 		return images
 	})()
 

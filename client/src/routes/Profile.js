@@ -54,7 +54,7 @@ class Home extends Component {
   // Handles file upload event and updates state
   handleUpload = (files, allFiles) => {
     if (files[0].meta.status === "done") {
-      UserService.uploadImage(this.props.session.user.sub, this.props.session.user.userName, files[0].file, this.props.session.credentials.idToken)
+      UserService.uploadImage(this.props.session.user.sub, this.props.session.user.userName, files[0].file)
         .then(result => {
           const img = {
             fileName: result.data[1].fileName,
@@ -97,8 +97,7 @@ class Home extends Component {
   getImages(sub, upload = false) {
     axios.get('/getImages', {
       params: {
-        sub: sub,
-        token: this.props.session.credentials.idToken
+        sub: sub
       }
     }).then((response) => {
       let jsonResponse = response.data
@@ -135,7 +134,6 @@ class Home extends Component {
             </Nav>
             </Navbar>
             <h1 id="hello_user">Hello {this.props.session.user.userName}, email: {this.props.session.user.email}</h1>
-            {console.log(this.props.session)}
             <div id="upload">
               <div id="upload-button">
                 <Dropzone
