@@ -28,7 +28,7 @@ class Callback extends Component {
   render () {
     // If there's no auth code in the URL or we're now logged into, redirect to the root page
     if ((!this.props.location.hash && !this.props.location.search) || this.props.session.isLoggedIn) {
-      UserService.createUser(this.props.session.user.sub)
+      UserService.createUser(this.props.session.user.sub, this.props.session.credentials.idToken)
       return <Redirect to="/" />
     }
 

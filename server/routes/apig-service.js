@@ -36,14 +36,15 @@ async function mySecrets(secretName) {
     });
 }
 
+var apigClientFactory = require('aws-api-gateway-client').default;
+
 //Gets all users
-var usersGet = async function () {
+var usersGet = async function (identificationToken) {
     // Get api key from secret manager
     var secret = await mySecrets('arn:aws:secretsmanager:us-east-1:632772847486:secret:APISecretKey-dW1L8m')
     secret = JSON.parse(secret)
     var API_KEY = secret['APISecretKey']
 
-    var apigClientFactory = require('aws-api-gateway-client').default;
     var apigClient = apigClientFactory.newClient({
         invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev', // REQUIRED
         apiKey: API_KEY, // REQUIRED
@@ -51,18 +52,24 @@ var usersGet = async function () {
     });
 
     var path = '/users'
-    const response = await apigClient.invokeApi({}, path, 'GET', {}, {})
+
+    var additionalParams = {
+        headers: {
+            Authorization: identificationToken
+        }
+    };
+
+    const response = await apigClient.invokeApi({}, path, 'GET', additionalParams, {})
     return response.data['Items']
 };
 
 //Gets user using id
-var userGet = async (id) => {
+var userGet = async (id, identificationToken) => {
     // Get api key from secret manager
     var secret = await mySecrets('arn:aws:secretsmanager:us-east-1:632772847486:secret:APISecretKey-dW1L8m')
     secret = JSON.parse(secret)
     var API_KEY = secret['APISecretKey']
 
-    var apigClientFactory = require('aws-api-gateway-client').default;
     var apigClient = apigClientFactory.newClient({
         invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev', // REQUIRED
         apiKey: API_KEY, // REQUIRED
@@ -73,17 +80,23 @@ var userGet = async (id) => {
     params = {
         id: id
     }
-    var response = await apigClient.invokeApi(params, path, 'GET', {}, {})
+
+    var additionalParams = {
+        headers: {
+            Authorization: identificationToken
+        }
+    };
+
+    var response = await apigClient.invokeApi(params, path, 'GET', additionalParams, {})
     return response.data['Item']
 };
 //Creates a user using id.
-var userCreate = async function (id) {
+var userCreate = async function (id, identificationToken) {
     // Get api key from secret manager
     var secret = await mySecrets('arn:aws:secretsmanager:us-east-1:632772847486:secret:APISecretKey-dW1L8m')
     secret = JSON.parse(secret)
     var API_KEY = secret['APISecretKey']
 
-    var apigClientFactory = require('aws-api-gateway-client').default;
     var apigClient = apigClientFactory.newClient({
         invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev', // REQUIRED
         apiKey: API_KEY, // REQUIRED
@@ -91,27 +104,33 @@ var userCreate = async function (id) {
     });
 
     var path = '/users'
-    body = {
+    var body = {
         "id": id,
         "images": [],
         "friends": []
     }
+
+    var additionalParams = {
+        headers: {
+            Authorization: identificationToken
+        }
+    };
+
     try {
-        var response = await apigClient.invokeApi({}, path, 'PUT', {}, body)
-        console.log(response.data)
+        var response = await apigClient.invokeApi({}, path, 'PUT', additionalParams, body)
+        // console.log(response.data)
     } catch(e) {
-        console.error(e);
+        // console.error(e);
     }
 };
 
 //Removes user using id.
-var userRemove = async function (id) {
+var userRemove = async function (id, identificationToken) {
     // Get api key from secret manager
     var secret = await mySecrets('arn:aws:secretsmanager:us-east-1:632772847486:secret:APISecretKey-dW1L8m')
     secret = JSON.parse(secret)
     var API_KEY = secret['APISecretKey']
 
-    var apigClientFactory = require('aws-api-gateway-client').default;
     var apigClient = apigClientFactory.newClient({
         invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev', // REQUIRED
         apiKey: API_KEY, // REQUIRED
@@ -119,43 +138,36 @@ var userRemove = async function (id) {
     });
 
     var path = '/users/{id}'
-    params = {
+    var params = {
         id: id
     }
-    var response = await apigClient.invokeApi(params, path, 'DELETE', {}, {})
+
+    var additionalParams = {
+        headers: {
+            Authorization: 'eyJraWQiOiJySEVpOWM5Mzc1bHE1VHgrQjM4bDJkaFZEUWZFWk1RemxyaGUxd1wvdUpXbz0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoic0xMenk4ZDdFdmlaM0Y3RW11cG5DUSIsInN1YiI6ImYzOWYyZWE3LTRjYjgtNDAwNy1hMjJkLWQyOWRiYmNkZjlmMCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV9kS0RDbTVCSU0iLCJjb2duaXRvOnVzZXJuYW1lIjoiYXJqdW4iLCJvcmlnaW5fanRpIjoiOTM5YTgwYjktMTc4Mi00ZDU3LTk4MDItM2QzNzg4MjI4YWJhIiwiYXVkIjoiMWU4M2xldWRpbHM3MmhmNGVmNnZhOWNiY3QiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTYyODMwMjk5NiwiZXhwIjoxNjI4MzA2NTk2LCJpYXQiOjE2MjgzMDI5OTYsImp0aSI6IjFiMWUyNDhhLTQyMjctNDEwOC05Y2E4LTQzOWU1NjYyMDg0ZiIsImVtYWlsIjoiYXJqdW4uYkBkYWwuY2EifQ.L65tuVAranf-Psy8uvefdi6orXeuTHNTbzDZSF79SRTjjygmN-NeeyHKjAPP7lp_gg_rauyvKjvbvtLeNiY-CZgzTvU6Gld8K4CRpAZNVlVvq2CtjsD9UU_7g8EYX7E9MRuzMTZcDbxknrScTYJSRJQMNOZklhCCZDc_P2FU0qVvLoUeXP32m4cEAxTgBWq4lcMrHANBRN9Hr94WRN97Nu9pAN95KRidhZ2GJ3l4Reyl0FjTSn553OfWlvCMpNlxnu-c5yd0WrjVvtSavk8_dco9F5t3yWXyGSMVnrlFGpheslZrGrCgpLg81kJp6HorxL9FCxi8xh0hmVGxT8kA3g'   
+        }
+    }
+
+    var response = await apigClient.invokeApi(params, path, 'DELETE', additionalParams, {})
     console.log(response.data)
 };
 //Gets image using id.
-var imagesGet = async function (id) {
-    // Get api key from secret manager
-    var secret = await mySecrets('arn:aws:secretsmanager:us-east-1:632772847486:secret:APISecretKey-dW1L8m')
-    secret = JSON.parse(secret)
-    var API_KEY = secret['APISecretKey']
-
-    var apigClientFactory = require('aws-api-gateway-client').default;
-    var apigClient = apigClientFactory.newClient({
-        invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev', // REQUIRED
-        apiKey: API_KEY, // REQUIRED
-        region: 'us-east-1' // REQUIRED
-    });
-
+var imagesGet = async function (id, token) {
     const images = await (async () => {
-        const user = await userGet(id)
+        const user = await userGet(id, token)
         const images = user['images']
-        console.log(images)
         return images
     })()
     return images
 }
 
 //Gets all users
-var imagesGetAll = async function () {
+var imagesGetAll = async function (identificationToken) {
     // Get api key from secret manager
     var secret = await mySecrets('arn:aws:secretsmanager:us-east-1:632772847486:secret:APISecretKey-dW1L8m')
     secret = JSON.parse(secret)
     var API_KEY = secret['APISecretKey']
 
-    var apigClientFactory = require('aws-api-gateway-client').default;
     var apigClient = apigClientFactory.newClient({
         invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev', // REQUIRED
         apiKey: API_KEY, // REQUIRED
@@ -163,18 +175,24 @@ var imagesGetAll = async function () {
     });
 
     var path = '/images'
-    const response = await apigClient.invokeApi({}, path, 'GET', {}, {})
+
+    var additionalParams = {
+        headers: {
+            Authorization: identificationToken
+        }
+    };
+
+    const response = await apigClient.invokeApi({}, path, 'GET', additionalParams, {})
     return response.data['Items']
 };
 
 //Adds an image to user using userid, imageid
-var imageCreate = async function (user, id, object) {
+var imageCreate = async function (user, id, object, identificationToken) {
     // Get api key from secret manager
     var secret = await mySecrets('arn:aws:secretsmanager:us-east-1:632772847486:secret:APISecretKey-dW1L8m')
     secret = JSON.parse(secret)
     var API_KEY = secret['APISecretKey']
 
-    var apigClientFactory = require('aws-api-gateway-client').default;
     var apigClient = apigClientFactory.newClient({
         invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev', // REQUIRED
         apiKey: API_KEY, // REQUIRED
@@ -186,26 +204,31 @@ var imageCreate = async function (user, id, object) {
         id: id,
         object: object
     }
-    var response = await apigClient.invokeApi(params, path, 'POST', {}, {})
-    console.log(response.data)
+
+    var additionalParams = {
+        headers: {
+            Authorization: identificationToken
+        }
+    };
+    var response = await apigClient.invokeApi(params, path, 'POST', additionalParams, {})
+    //console.log(response.data)
     console.log(user)
     var path = '/images'
     const body = {
         image: object,
         user: user
     }
-    var response = await apigClient.invokeApi({}, path, 'PUT', {}, body)
-    console.log(response.data)
+    var response = await apigClient.invokeApi({}, path, 'PUT', additionalParams, body)
+    // console.log(response.data)
 }
 
 //Remove image from user using userid, imageid
-var imageRemove = async function (id, object) {
+var imageRemove = async function (id, object, identificationToken) {
     // Get api key from secret manager
     var secret = await mySecrets('arn:aws:secretsmanager:us-east-1:632772847486:secret:APISecretKey-dW1L8m')
     secret = JSON.parse(secret)
     var API_KEY = secret['APISecretKey']
 
-    var apigClientFactory = require('aws-api-gateway-client').default;
     var apigClient = apigClientFactory.newClient({
         invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev', // REQUIRED
         apiKey: API_KEY, // REQUIRED
@@ -226,7 +249,14 @@ var imageRemove = async function (id, object) {
             return images.indexOf(object)
         })()
     }
-    var response = await apigClient.invokeApi(params, path, 'DELETE', {}, body)
+
+    var additionalParams = {
+        headers: {
+            Authorization: identificationToken
+        }
+    };
+
+    var response = await apigClient.invokeApi(params, path, 'DELETE', additionalParams, body)
     console.log(response.data)
 }
 
