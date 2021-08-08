@@ -3,13 +3,14 @@ import { connect } from 'react-redux'
 import cognitoUtils from '../lib/cognitoUtils'
 import axios from 'axios'
 import 'react-dropzone-uploader/dist/styles.css'
-import { Navbar, Nav } from 'react-bootstrap'
+import { Navbar, Nav, ModalTitle, Button, Modal } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
 import './Home.css'
 import { FaUserCircle } from 'react-icons/fa';
+import ModalHeader from 'react-bootstrap/esm/ModalHeader'
 
 const mapStateToProps = state => {
   return { session: state.session }
@@ -21,7 +22,10 @@ class Home extends Component {
     this.state = {
       images: [],
       isOpen: false,
-      largeImageSrc: ''
+      largeImageSrc: '',
+      userImages: [],
+      viewUser: false,
+      currUserView: ''
     }
   }
 
@@ -80,6 +84,28 @@ class Home extends Component {
     })
   }
 
+  getUserImages(username) {
+    axios.get('/getAllImages', {
+      params: {
+        token: this.props.session.credentials.idToken
+      }
+    }).then((response) => {
+      let jsonResponse = response.data
+      const img = []
+      for (let i = 1; i < jsonResponse.length; i++) {
+        if (jsonResponse[i].by === username) {
+          let temp_img = {
+            fileName: jsonResponse[i].fileName,
+            imageSrc: jsonResponse[i].data,
+            user: jsonResponse[i].by 
+          }
+          img.push(temp_img)
+        }
+        this.setState({ userImages: img, viewUser: true, currUserView: username })
+      }
+    })
+  }
+
   render() {
     return (
       <div className="Home">
@@ -95,7 +121,6 @@ class Home extends Component {
             <Nav className="ml-auto">
               <LinkContainer exact to="/"><Nav.Link>Home</Nav.Link></LinkContainer>
               <LinkContainer exact to="/profile"><Nav.Link>Profile</Nav.Link></LinkContainer>
-              <Nav.Link>Friends</Nav.Link>
               <Nav.Link onClick={this.onSignOut}>Sign Out</Nav.Link>
             </Nav>
             </Navbar>
@@ -107,11 +132,10 @@ class Home extends Component {
               {this.state.images.map(image => (
                 <div className="image-div">
                   <img className="image" src={image.imageSrc} alt={image.user} onClick={this.setLargeImage(image.fileName)} />
-                  <div className="name"><FaUserCircle /> <a className="name-link" href="url">{image.user}</a></div>
+                  <div className="name"><FaUserCircle /> <a className="name-link" onClick={() => this.getUserImages(image.user)}>{image.user}</a></div>
                 </div>
               ))}
             </section>
-
             {/* Open the modal to display large image */}
             {this.state.isOpen && (
               <Lightbox
@@ -120,6 +144,26 @@ class Home extends Component {
               />
             )}
             <br/>
+            <div>
+              <Modal show={this.state.viewUser}>
+                <ModalHeader>
+                  <ModalTitle>{this.state.currUserView}'s Profile</ModalTitle>
+                  <button type="button" class="btn-close" onClick={() => this.setState({ viewUser: false })} />
+                </ModalHeader>
+                <Modal.Body>
+                  {this.state.userImages.map(image => (
+                    <div className="image-div">
+                      <img className="image" src={image.imageSrc} alt={image.user} onClick={this.setLargeImage(image.fileName)} />
+                      <br/>
+                    </div>
+                  ))}
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="primary">Add Friend</Button>
+                  <Button variant="secondary" onClick={() => this.setState({ viewUser: false })}>Close</Button>
+                </Modal.Footer>
+              </Modal>
+            </div>
           </div>
         ) : (
           <div id="container">

@@ -1,16 +1,19 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import { connect } from 'react-redux'
 import cognitoUtils from '../lib/cognitoUtils'
 import UserService from "./services/user-service"
 import axios from 'axios'
 import 'react-dropzone-uploader/dist/styles.css'
 import Dropzone from 'react-dropzone-uploader'
-import { Alert, Navbar, Container, Nav } from 'react-bootstrap'
+import { Alert, Navbar, Container, Nav, ModalTitle, ModalBody, ModalFooter } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
 import './Home.css'
+import { Button } from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
+import ModalHeader from 'react-bootstrap/esm/ModalHeader'
 
 const mapStateToProps = state => {
   return { session: state.session }
@@ -23,7 +26,9 @@ class Home extends Component {
       uploaded: false,
       images: [],
       isOpen: false,
-      largeImageSrc: ''
+      largeImageSrc: '',
+      showFriends: false,
+      friends: []
     }
     this.handleUpload = this.handleUpload.bind(this)
     this.setUploaded = this.setUploaded.bind(this)
@@ -94,6 +99,24 @@ class Home extends Component {
     // this.setState({ isOpen: true, largeImageSrc: e.target.currentSrc })
   }
 
+  getFriends(sub) {
+    axios.get('/getFriends', {
+      params: {
+        sub : sub,
+        token: this.props.session.credentials.idToken
+      }
+    }).then((response) => {
+      console.log("Rsp:" + response)
+      let jsonResponse = response.data
+      const f = []
+      for (let i = 0; i < jsonResponse.length; i++) {
+        f.push(jsonResponse[i])
+      }
+      this.setState({ friends: f })
+    })
+    this.setState({ showFriends: true})
+  }
+
   getImages(sub, upload = false) {
     axios.get('/getImages', {
       params: {
@@ -130,12 +153,30 @@ class Home extends Component {
             <Nav className="ml-auto">
               <LinkContainer exact to="/"><Nav.Link>Home</Nav.Link></LinkContainer>
               <LinkContainer exact to="/profile"><Nav.Link>Profile</Nav.Link></LinkContainer>
-              <Nav.Link>Friends</Nav.Link>
               <Nav.Link onClick={this.onSignOut}>Sign Out</Nav.Link>
             </Nav>
             </Navbar>
             <h1 id="hello_user">Hello {this.props.session.user.userName}, email: {this.props.session.user.email}</h1>
             {console.log(this.props.session)}
+            <div class="text-center">
+              <Button variant="primary" class="text-center" onClick={() => this.getFriends(this.props.session.user.sub)}> My Friends </Button>
+            </div>
+            <div>
+              <Modal show={this.state.showFriends}>
+                <ModalHeader>
+                  <ModalTitle>My Friends</ModalTitle>
+                </ModalHeader>
+                <Modal.Body>
+                  {this.state.friends.map(friend => (
+                    <p> {friend} </p>
+                  ))}
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="primary" onClick={() => this.setState({ showFriends: false })}>Close</Button>
+                </Modal.Footer>
+              </Modal>
+            </div>
+            <br/>
             <div id="upload">
               <div id="upload-button">
                 <Dropzone
