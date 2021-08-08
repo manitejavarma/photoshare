@@ -119,6 +119,33 @@ var userFriends = async (id, identificationToken) => {
     return response.data['Item']
 };
 
+//Adds a friend to user
+var addFriend = async function (id, object, identificationToken) {
+    // Get api key from secret manager
+    var secret = await mySecrets('arn:aws:secretsmanager:us-east-1:632772847486:secret:APISecretKey-dW1L8m')
+    secret = JSON.parse(secret)
+    var API_KEY = secret['APISecretKey']
+
+    var apigClient = apigClientFactory.newClient({
+        invokeUrl:'https://3xxda0js4d.execute-api.us-east-1.amazonaws.com/dev', // REQUIRED
+        apiKey: API_KEY, // REQUIRED
+        region: 'us-east-1' // REQUIRED
+    });
+
+    var path = '/users/{id}/friends/{object}'
+    params = {
+        id: id,
+        object: object
+    }
+
+    var additionalParams = {
+        headers: {
+            Authorization: identificationToken
+        }
+    };
+    var response = await apigClient.invokeApi(params, path, 'POST', additionalParams, {})
+}
+
 //Creates a user using id.
 var userCreate = async function (id, identificationToken) {
     // Get api key from secret manager
@@ -313,4 +340,4 @@ var imageRemove = async function (id, object, identificationToken) {
 // imageCreate("cc", "xas")
 //imageRemove("cc", "xas")
 
-module.exports = { imageCreate, imageRemove, userCreate, userGet, userRemove, usersGet, imagesGet, imagesGetAll, userFriends }
+module.exports = { imageCreate, imageRemove, userCreate, userGet, userRemove, usersGet, imagesGet, imagesGetAll, userFriends, addFriend }

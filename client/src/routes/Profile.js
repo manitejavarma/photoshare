@@ -5,7 +5,7 @@ import UserService from "./services/user-service"
 import axios from 'axios'
 import 'react-dropzone-uploader/dist/styles.css'
 import Dropzone from 'react-dropzone-uploader'
-import { Alert, Navbar, Nav, ModalTitle } from 'react-bootstrap'
+import { Alert, Navbar, Container, Nav, ModalTitle, ModalBody, ModalFooter } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Lightbox from "react-image-lightbox"
@@ -14,6 +14,7 @@ import './Home.css'
 import { Button } from 'react-bootstrap'
 import { Modal } from 'react-bootstrap'
 import ModalHeader from 'react-bootstrap/esm/ModalHeader'
+import { BrowserRouter as Link } from 'react-router-dom'
 
 const mapStateToProps = state => {
   return { session: state.session }
@@ -106,8 +107,7 @@ class Home extends Component {
         token: this.props.session.credentials.idToken
       }
     }).then((response) => {
-      console.log("Rsp:" + response)
-      let jsonResponse = response.data
+      let jsonResponse = response.data.friends
       const f = []
       for (let i = 0; i < jsonResponse.length; i++) {
         f.push(jsonResponse[i])
@@ -168,7 +168,10 @@ class Home extends Component {
                 </ModalHeader>
                 <Modal.Body>
                   {this.state.friends.map(friend => (
-                    <p> {friend} </p>
+                    <div>
+                      {/*<p>{friend}</p>*/}
+                      <Link to={{pathname: "user", query: {username: friend}}} className='name-link'>{friend}</Link>
+                    </div>
                   ))}
                 </Modal.Body>
                 <Modal.Footer>

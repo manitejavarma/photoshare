@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import Lightbox from "react-image-lightbox"
 import "react-image-lightbox/style.css"
 import './Home.css'
+import { Button } from 'react-bootstrap'
 
 const mapStateToProps = state => {
   return { session: state.session }
@@ -77,6 +78,18 @@ class Home extends Component {
     this.setState({ showFriends: true})
   }
 
+  addFriend(sub) {
+    axios.post('/addFriend', {
+      params: {
+        sub : sub,
+        friend: this.props.location.query['username'],
+        token: this.props.session.credentials.idToken  
+      }
+    }).then((response) => {
+      console.log(response)
+    })
+  }
+
   getUserImages(username) {
     axios.get('/getAllImages', {
       params: {
@@ -119,9 +132,12 @@ class Home extends Component {
               <Nav.Link onClick={this.onSignOut}>Sign Out</Nav.Link>
             </Nav>
             </Navbar>
-            <h1 id="hello_user">{this.props.session.user.userName}'s Profile</h1>
+            <h1 id="hello_user">{this.props.location.query['username']}'s Profile</h1>
+            <div class="text-center">
+              <Button variant="primary" class="text-center" onClick={() => this.addFriend(this.props.session.user.sub)}>Add Friend</Button>
+            </div>
             <br/>
-            <br />
+            <br/>
             {this.state.uploaded ? <Alert variant="success" onClose={() => this.setUploaded(false)} dismissible>The image was uploaded successfully!</Alert> : null}
             <section id="image-container">
               {/* Display all images here */}

@@ -1,4 +1,4 @@
-const { imageCreate, imagesGet, imagesGetAll, userFriends } = require("./apig-service.js")
+const { imageCreate, imagesGet, imagesGetAll, userFriends, addFriend } = require("./apig-service.js")
 const imageThumbnail = require('image-thumbnail');
 
 const upload = require('./middleware'),
@@ -75,13 +75,28 @@ router.get('/getFriends', async (req, res) => {
 	})()
 
 	try {
-		console.log(friendsList);
 		res.send(friendsList);
-		console.log(res);
 	} catch (err) {
 		console.log(err);
 	}
 });
+
+router.post('/addFriend', async (req, res) => {
+	const sub = req.query.sub
+	const identificationToken = req.query.token
+	const friendname = req.query.friend
+	try {
+		addFriend(sub, friendname, identificationToken)
+		var responseJSON = new Array();
+		var message = new Object();
+		message.status = "Success";
+		responseJSON.push(message);
+		res.status(200).json(responseJSON)
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ message: err})
+	}
+})
 
 router.get('/getImages', async (req, res) => {
 
