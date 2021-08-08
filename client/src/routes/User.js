@@ -22,13 +22,16 @@ class Home extends Component {
       images: [],
       isOpen: false,
       largeImageSrc: '',
-      friends: []
+      friends: [],
+      isFriend: false,
+      buttonText: "Add Friend"
     }
   }
 
   componentDidMount() {
     if (this.props.session.isLoggedIn) {
         this.getUserImages(this.props.location.query['username'])
+        this.checkFriend(this.props.session.user.sub);
     }
   }
 
@@ -60,22 +63,25 @@ class Home extends Component {
     // this.setState({ isOpen: true, largeImageSrc: e.target.currentSrc })
   }
 
-  getFriends(sub) {
-    axios.get('/getFriends', {
-      params: {
-        sub : sub,
-        token: this.props.session.credentials.idToken
-      }
-    }).then((response) => {
-      console.log("Rsp:" + response)
-      let jsonResponse = response.data
-      const f = []
-      for (let i = 0; i < jsonResponse.length; i++) {
-        f.push(jsonResponse[i])
-      }
-      this.setState({ friends: f })
-    })
-    this.setState({ showFriends: true})
+  checkFriend(sub) {
+    const username = this.props.location.query['username'];
+    if (username === this.props.session.user.userName) {
+      this.setState({ isFriend: true, buttonText: "Your Page"})
+    } else {
+      axios.get('/getFriends', {
+        params: {
+          sub : sub,
+          token: this.props.session.credentials.idToken
+        }
+      }).then((response) => {
+        let jsonResponse = response.data.friends
+        for (let i = 0; i < jsonResponse.length; i++) {
+          if ( username === jsonResponse[i]) {
+            this.setState({ isFriend: true, buttonText: "Friended"})
+          }
+        }
+      })
+    }
   }
 
   addFriend(sub) {
@@ -86,7 +92,11 @@ class Home extends Component {
         token: this.props.session.credentials.idToken  
       }
     }).then((response) => {
-      console.log(response)
+      if (response.status === 200) {
+        this.setState({ isFriend: true, buttonText: "Friended"})
+      } else {
+        console.log(response)
+      }
     })
   }
 
@@ -134,7 +144,7 @@ class Home extends Component {
             </Navbar>
             <h1 id="hello_user">{this.props.location.query['username']}'s Profile</h1>
             <div class="text-center">
-              <Button variant="primary" class="text-center" onClick={() => this.addFriend(this.props.session.user.sub)}>Add Friend</Button>
+              <Button variant="primary" class="text-center" disabled={this.state.isFriend} onClick={() => this.addFriend(this.props.session.user.sub)}>{this.state.buttonText}</Button>
             </div>
             <br/>
             <br/>
