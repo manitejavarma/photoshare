@@ -11,6 +11,7 @@ import "react-image-lightbox/style.css"
 import './Home.css'
 import { FaUserCircle } from 'react-icons/fa';
 import ModalHeader from 'react-bootstrap/esm/ModalHeader'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 
 const mapStateToProps = state => {
   return { session: state.session }
@@ -132,7 +133,7 @@ class Home extends Component {
               {this.state.images.map(image => (
                 <div className="image-div">
                   <img className="image" src={image.imageSrc} alt={image.user} onClick={this.setLargeImage(image.fileName)} />
-                  <div className="name"><FaUserCircle /> <a className="name-link" onClick={() => this.getUserImages(image.user)}>{image.user}</a></div>
+                  <div className="name"><FaUserCircle /> <Link to={{pathname: "user", query: {username: image.user}}} className='name-link'>{image.user}</Link></div>
                 </div>
               ))}
             </section>
